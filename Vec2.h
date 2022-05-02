@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Common.h"
+
 class Vec2
 {
 public:
@@ -23,5 +25,5 @@ public:
   Vec2& operator *= (const float val);
   Vec2& operator /= (const float val);
 
-  float dist(const Vec2& rhs) const;
+  //float dist(const Vec2& rhs) const;
 };

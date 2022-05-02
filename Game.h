@@ -1,4 +1,8 @@
 #pragma once
+
+#include "Entity.h"
+#include "Common.h"
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
 
@@ -24,31 +28,26 @@
 #define YELLOW  0xFFE0
 #define WHITE   0xFFFF
 
+#define PLAYER_SPEED   2
+#define PLAYER_JUMP    -7
+#define PLAYER_GRAVITY 1
+
 class Game
 {
 private:
-  Adafruit_SSD1331 m_display    = Adafruit_SSD1331(&SPI, CS, DC, RST);
+
+  Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
   uint8_t m_height = 64;
   uint8_t m_width  = 96;
+
+  Entity* m_player = nullptr;
   
   const uint8_t m_BALL_RATE = 40;
-
-  bool m_resetBall = false;
   unsigned long m_ballUpdate;
+  bool m_running = true;
   
-  float m_playerSpeed    = 2;
-  float m_playerJump     = -7;
-  float m_playerMaxSpeed = 8;
-  float m_playerGravity  = 1;
-  float m_ballPosX       = 48;
-  float m_ballPosY       = 32;
-  float m_ballPrevPosX   = 48;
-  float m_ballPrevPosY   = 32;
-  float m_ballVelX       = 1;
-  float m_ballVelY       = 1;
-  bool m_grounded        = false;
-
   void init();
+  void update();
 
   void sMovement();
   void sUserInput();
@@ -56,12 +55,9 @@ private:
   void sRender();
 
   void spawnPlayer();
+  
 public:
-  bool leftState;
-  bool rightState;
-  bool jumpState;
 
   Game();
-
-  void update();
+  void run();
 };
