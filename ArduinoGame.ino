@@ -13,6 +13,7 @@ int main(void)
   Serial.println("Arduino: Setup");
 #endif
 
+  // to restart the game we can just exit the game loop
   for (;;) {
     game = new Game();
     game->run();

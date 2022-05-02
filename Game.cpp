@@ -33,8 +33,9 @@ void Game::init()
   delay(2000);
   m_display.fillScreen(BLACK);
 
+  m_entityManager = EntityManager();
   spawnPlayer();
-
+  
   m_ballUpdate = millis();
 }
 
@@ -43,13 +44,21 @@ void Game::spawnPlayer()
 #if DEBUGMODE
   Serial.println("Game: Spawn Player");
 #endif
-  delete m_player;
-  m_player = new Entity(0, "player");
-  m_player->cTransform = new CTransform({ 48, 32},
+
+  if(m_player) { m_player->destroy(); }
+  
+  m_player = m_entityManager.addEntity("player");
+  
+  m_player->cTransform = new CTransform({ 48, 32 },
                                         { 0, 0 });
   m_player->cBoundingBox = new CBoundingBox({ 1, 1 });
   m_player->cGravity     = new CGravity(1);
   m_player->cInput       = new CInput();
+
+#if DEBUGMODE
+  Serial.print("Game: Spawned Player with ID: ");
+  Serial.println(m_player->id());
+#endif
 }
 
 void Game::run()
@@ -57,6 +66,7 @@ void Game::run()
 #if DEBUGMODE
   Serial.println("Game: Run");
 #endif
+
   while(m_running)
   {
     update();
@@ -65,10 +75,9 @@ void Game::run()
 
 void Game::update()
 {
-#if DEBUGMODE
-  Serial.println("Game: Update");
-#endif
   unsigned long time = millis();
+  
+  m_entityManager.update();
     
   if (time > m_ballUpdate) 
   {
@@ -76,6 +85,23 @@ void Game::update()
     sMovement();
     sCollision();
     sRender();
+    
+    fps(1);
+  }
+}
+
+void Game::fps(unsigned int seconds){
+  frameCount ++;
+  if ((millis() - lastMillis) > (seconds * 1000)) {
+    framesPerSecond = (frameCount / seconds);
+    frameCount = 0;
+    lastMillis = millis();
+
+    m_display.fillRect(0, 0, 42, 8, BLACK);
+    m_display.setCursor(0, 0);
+    m_display.setTextColor(WHITE);
+    m_display.setTextSize(1);
+    m_display.print(framesPerSecond);
   }
 }
 
@@ -87,14 +113,14 @@ void Game::sUserInput()
   pInput->right = (digitalRead(RIGHT_BUTTON) == HIGH);
   pInput->jump  = (digitalRead(JUMP_BUTTON)  == HIGH);
 
-#if DEBUGMODE
-  Serial.print("Left: ");
-  Serial.print(pInput->left);
-  Serial.print(" Right: ");
-  Serial.print(pInput->right);
-  Serial.print(" Jump: ");
-  Serial.println(pInput->jump);
-#endif
+//#if DEBUGMODE
+//  Serial.print("Left: ");
+//  Serial.print(pInput->left);
+//  Serial.print(" Right: ");
+//  Serial.print(pInput->right);
+//  Serial.print(" Jump: ");
+//  Serial.println(pInput->jump);
+//#endif
 }
 
 void Game::sMovement()

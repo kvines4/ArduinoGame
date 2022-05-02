@@ -5,14 +5,18 @@
 
 class Entity
 {
+private:
+
+  friend class EntityManager;
+
+  Entity(const size_t id, const String& tag);
+  ~Entity();
+
   bool m_active = true;
   size_t m_id   = 0;
   String m_tag  = "Default";
 
 public:
-  // constructor and destructor
-  Entity(const size_t id, const String& tag);
-  ~Entity();
   
   // component pointers
   CTransform* cTransform     = nullptr;

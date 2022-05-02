@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Entity.h"
+#include "EntityManager.h"
 #include "Common.h"
 
 #include <Adafruit_GFX.h>
@@ -35,16 +36,23 @@
 class Game
 {
 private:
+  const uint8_t m_BALL_RATE = 16;
+  unsigned long m_ballUpdate;
+  bool m_running = true;
 
   Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
   uint8_t m_height = 64;
   uint8_t m_width  = 96;
 
+  unsigned long lastMillis;
+  unsigned long frameCount;
+  unsigned int  framesPerSecond;
+  void fps(unsigned int seconds);
+  
+  EntityManager m_entityManager;
+
   Entity* m_player = nullptr;
   
-  const uint8_t m_BALL_RATE = 40;
-  unsigned long m_ballUpdate;
-  bool m_running = true;
   
   void init();
   void update();
