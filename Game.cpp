@@ -13,7 +13,7 @@ Game::Game()
 void Game::init()
 {
 #if DEBUGMODE
-	Serial.println("Game: Init");
+	Serial.println("Game:     Init");
 #endif
 
 	pinMode(LEFT_BUTTON, INPUT_PULLUP);
@@ -24,10 +24,10 @@ void Game::init()
 
 	// show splash screen
 	m_display.fillScreen(BLACK);
-	m_display.setCursor(10, 13);
+	m_display.setCursor(6, 13);
 	m_display.setTextColor(RED);
 	m_display.setTextSize(2);
-	m_display.print("Ball");
+	m_display.print("Arduino");
 	m_display.drawBitmap(10, 25, game, 75, 26, RED);
 
 	delay(2000);
@@ -36,13 +36,13 @@ void Game::init()
 	m_entityManager = EntityManager();
 	spawnPlayer();
 
-	m_ballUpdate = millis();
+	m_frameStartTime = millis();
 }
 
 void Game::spawnPlayer()
 {
 #if DEBUGMODE
-	Serial.println("Game: Spawn Player");
+	Serial.println("Game:     Spawn Player");
 #endif
 
 	if (m_player)
@@ -62,10 +62,8 @@ void Game::spawnPlayer()
 void Game::run()
 {
 #if DEBUGMODE
-	Serial.println("Game: Run");
+	Serial.println("Game:     Run");
 #endif
-
-	// animationTest();
 
 	while (m_running)
 	{
@@ -73,13 +71,17 @@ void Game::run()
 	}
 }
 
+/// millis() returns the number of milliseconds passed since the Arduino board began.
+/// Each call we check if enough milliseconds have passed before doing the next frame.
+/// This should keep the frame rate consistent.
+/// 
 void Game::update()
 {
-	unsigned long time = millis();
+	m_frameCurrentTime = millis();
 
 	m_entityManager.update();
 
-	if (time > m_ballUpdate)
+	if (m_frameCurrentTime - m_frameStartTime >= m_GAME_PERIOD)
 	{
 		sUserInput();
 		sMovement();
@@ -87,6 +89,8 @@ void Game::update()
 		sRender();
 
 		fps(1);
+
+		m_frameStartTime = m_frameCurrentTime;
 	}
 }
 
@@ -211,24 +215,46 @@ void Game::sRender()
 
 		m_display.drawRGBBitmap(pTransform->pos.x, pTransform->pos.y, *(storage[index]), spriteSize.x, spriteSize.y);
 	}
-
-	fps(1);
-	m_ballUpdate += m_BALL_RATE;
 }
 
+/// @brief Calculate FPS
+/// @param seconds How many seconds between FPS checks
 void Game::fps(unsigned int seconds)
 {
-	frameCount++;
-	if ((millis() - lastMillis) > (seconds * 1000))
+	m_frameCount++;
+	m_fpsCurrentTime = millis();
+	if ((m_fpsCurrentTime - m_fpsLastCheckTime) >= (seconds * 1000))
 	{
-		framesPerSecond = (frameCount / seconds);
-		frameCount = 0;
-		lastMillis = millis();
+		m_fps = (m_frameCount / seconds);
+		m_frameCount = 0;
+		m_fpsLastCheckTime = m_fpsCurrentTime;
 
 		m_display.fillRect(0, 0, 42, 8, BLACK);
 		m_display.setCursor(0, 0);
 		m_display.setTextColor(WHITE);
 		m_display.setTextSize(1);
-		m_display.print(framesPerSecond);
+		m_display.print(m_fps);
+
+#if DEBUGMODE
+		Serial.print("FPS: ");
+		Serial.println(m_fps);
+#endif
 	}
 }
+
+// void Game::fpsOld(unsigned int seconds)
+// {
+// 	frameCount++;
+// 	if ((millis() - lastMillis) > (seconds * 1000))
+// 	{
+// 		framesPerSecond = (frameCount / seconds);
+// 		frameCount = 0;
+// 		lastMillis = millis();
+
+// 		m_display.fillRect(0, 0, 42, 8, BLACK);
+// 		m_display.setCursor(0, 0);
+// 		m_display.setTextColor(WHITE);
+// 		m_display.setTextSize(1);
+// 		m_display.print(framesPerSecond);
+// 	}
+// }

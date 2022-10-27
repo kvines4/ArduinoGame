@@ -36,22 +36,25 @@
 class Game
 {
 private:
-	const uint8_t m_BALL_RATE = 16;
-	unsigned long m_ballUpdate;
 	bool m_running = true;
+
+	EntityManager m_entityManager;
+	Entity *m_player = nullptr;
 
 	Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
 	uint8_t m_height = 64;
 	uint8_t m_width = 96;
 
-	unsigned long lastMillis;
-	unsigned long frameCount;
-	unsigned int framesPerSecond;
+	const uint8_t m_GAME_PERIOD = 16;
+	unsigned long m_frameStartTime;
+	unsigned long m_frameCurrentTime;
+	unsigned long m_fpsLastCheckTime;
+	unsigned long m_fpsCurrentTime;
+	unsigned long m_lastMillis;
+	unsigned long m_frameCount;
+	unsigned int m_fps;
+
 	void fps(unsigned int seconds);
-
-	EntityManager m_entityManager;
-
-	Entity *m_player = nullptr;
 
 	void init();
 	void update();
