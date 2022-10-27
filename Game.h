@@ -15,8 +15,8 @@
 // SSD1331 Pins
 #define SCLK 13 // SCL
 #define MOSI 11 // SDA
-#define RST  9  // RES
-#define DC   8  // DC
+#define RST  8  // RES
+#define DC   9  // DC
 #define CS   10 // CS
 
 // Color definitions
@@ -36,36 +36,35 @@
 class Game
 {
 private:
-  const uint8_t m_BALL_RATE = 16;
-  unsigned long m_ballUpdate;
-  bool m_running = true;
+	const uint8_t m_BALL_RATE = 16;
+	unsigned long m_ballUpdate;
+	bool m_running = true;
 
-  Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
-  uint8_t m_height = 64;
-  uint8_t m_width  = 96;
+	Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
+	uint8_t m_height = 64;
+	uint8_t m_width = 96;
 
-  unsigned long lastMillis;
-  unsigned long frameCount;
-  unsigned int  framesPerSecond;
-  void fps(unsigned int seconds);
-  
-  EntityManager m_entityManager;
+	unsigned long lastMillis;
+	unsigned long frameCount;
+	unsigned int framesPerSecond;
+	void fps(unsigned int seconds);
 
-  Entity* m_player = nullptr;
-  
-  
-  void init();
-  void update();
+	EntityManager m_entityManager;
 
-  void sMovement();
-  void sUserInput();
-  void sCollision();
-  void sRender();
+	Entity *m_player = nullptr;
 
-  void spawnPlayer();
-  
+	void init();
+	void update();
+	void animationTest();
+
+	void sMovement();
+	void sUserInput();
+	void sCollision();
+	void sRender();
+
+	void spawnPlayer();
+
 public:
-
-  Game();
-  void run();
+	Game();
+	void run();
 };

@@ -5,24 +5,24 @@
 
 #include <Vector.h>
 
-typedef Vector<Entity*> EntityVec;
+typedef Vector<Entity *> EntityVec;
 
 class EntityManager
 {
-  EntityVec m_entities;
-  EntityVec m_entitiesToAdd;
-  int storage_array[100];
-  size_t    m_totalEntities = 0;
+	EntityVec m_entities;
+	EntityVec m_entitiesToAdd;
+	int storage_array[100];
+	size_t m_totalEntities = 0;
 
-  void removeDeadEntities();
+	void removeDeadEntities();
 
 public:
-  EntityManager();
+	EntityManager();
 
-  void update();
+	void update();
 
-  Entity* addEntity(const String& tag);
+	Entity *addEntity(const String &tag);
 
-  const EntityVec& getEntities();
-  size_t getTotal() const;
+	const EntityVec &getEntities();
+	size_t getTotal() const;
 };

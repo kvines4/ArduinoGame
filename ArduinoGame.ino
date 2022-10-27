@@ -2,22 +2,22 @@
 #include "Game.h"
 #include "Common.h"
 
-Game* game;
+Game *game;
 
 int main(void)
 {
-  init();
+	init();
 
 #if DEBUGMODE
-  Serial.begin(9600);
-  Serial.println("Arduino: Setup");
+	Serial.begin(9600);
 #endif
 
-  // to restart the game we can just exit the game loop
-  for (;;) {
-    game = new Game();
-    game->run();
-  }
+	// to restart the game we can just exit the game loop
+	for (;;)
+	{
+		game = new Game();
+		game->run();
+	}
 
-  return 0;
+	return 0;
 }
