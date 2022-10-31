@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "EntityManager.h"
 #include "Common.h"
+#include "Vec2.h"
 
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
@@ -13,11 +14,11 @@
 #define JUMP_BUTTON  2
 
 // SSD1331 Pins
-#define SCLK 13 // SCL
-#define MOSI 11 // SDA
+#define SCLK 13 // SCL // 13 is serial clock on pro mini
+#define MOSI 11 // SDA // 11 is mosi on pro mini
 #define RST  8  // RES
 #define DC   9  // DC
-#define CS   10 // CS
+#define CS   10 // CS // 10 is slave select on pro mini
 
 // Color definitions
 #define BLACK   0x0000
@@ -50,15 +51,20 @@ private:
 	unsigned long m_frameCurrentTime;
 	unsigned long m_fpsLastCheckTime;
 	unsigned long m_fpsCurrentTime;
-	unsigned long m_lastMillis;
 	unsigned long m_frameCount;
 	unsigned int m_fps;
+
+	unsigned long m_animLastCheckTime;
+	unsigned long m_animCurrentTime;
+	unsigned long m_animframeCount;
+	unsigned int m_ANIM_RATE = 120;
+	unsigned int m_spriteIndex;
+	Vec2 m_spriteSize = {16, 16};
 
 	void fps(unsigned int seconds);
 
 	void init();
 	void update();
-	void animationTest();
 
 	void sMovement();
 	void sUserInput();

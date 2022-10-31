@@ -1,6 +1,8 @@
 {
-    "board": "arduino:avr:uno",
-    "programmer": "arduino:avrisp",
-    "port": "COM4",
-    "sketch": "ArduinoGame.ino"
+    "board": "arduino:avr:pro",
+    "programmer": "arduino:avrispmkii",
+    "port": "COM5",
+    "sketch": "ArduinoGame.ino",
+    "configuration": "cpu=16MHzatmega328",
+    "output": "./ArduinoOutput"
 }

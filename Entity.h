@@ -17,10 +17,10 @@ private:
 
 public:
 	// component pointers
-	CTransform   *cTransform   = nullptr;
+	CTransform	 *cTransform   = nullptr;
 	CBoundingBox *cBoundingBox = nullptr;
-	CInput       *cInput       = nullptr;
-	CGravity     *cGravity     = nullptr;
+	CInput		 *cInput	   = nullptr;
+	CGravity	 *cGravity	   = nullptr;
 
 	// private member access functions
 	bool isActive();

@@ -1,0 +1,137 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\cores\\arduino"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\variants\\eightanaloginputs"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\ArduinoGame.ino.cpp",
+    "Include": "Vector.h",
+    "Includepath": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Vector\\src"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\ArduinoGame.ino.cpp",
+    "Include": "Adafruit_GFX.h",
+    "Includepath": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\ArduinoGame.ino.cpp",
+    "Include": "Adafruit_SSD1331.h",
+    "Includepath": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\arduino_44931"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\ArduinoGame.ino.cpp",
+    "Include": "SPI.h",
+    "Includepath": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\SPI\\src"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\ArduinoGame.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Animation.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Entity.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\EntityManager.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Game.cpp",
+    "Include": "Wire.h",
+    "Includepath": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src"
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Game.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Physics.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "c:\\Users\\kvines4\\source\\repos\\Personal\\Arduino\\ArduinoGame\\ArduinoOutput\\sketch\\Vec2.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Vector\\src\\Vector\\Vector.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_GFX.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_GrayOLED.cpp",
+    "Include": "Adafruit_I2CDevice.h",
+    "Includepath": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_BusIO"
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_GrayOLED.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\Adafruit_SPITFT.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_GFX_Library\\glcdfont.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\arduino_44931\\Adafruit_SSD1331.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\SPI\\src\\SPI.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src\\Wire.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Program Files (x86)\\Arduino\\hardware\\arduino\\avr\\libraries\\Wire\\src\\utility\\twi.c",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_BusIO_Register.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_I2CDevice.cpp",
+    "Include": "",
+    "Includepath": null
+  },
+  {
+    "Sourcefile": "C:\\Users\\kvines4\\OneDrive - DXC Production\\Documents\\Arduino\\libraries\\Adafruit_BusIO\\Adafruit_SPIDevice.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]
