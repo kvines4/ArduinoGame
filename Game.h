@@ -20,19 +20,10 @@
 #define DC   9  // DC
 #define CS   10 // CS // 10 is slave select on pro mini
 
-// Color definitions
-#define BLACK   0x0000
-#define BLUE    0x001F
-#define RED     0xF800
-#define GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0
-#define WHITE   0xFFFF
-
-#define PLAYER_SPEED   2
-#define PLAYER_JUMP    -7
-#define PLAYER_GRAVITY 1
+#define PLAYER_SPEED   3
+#define PLAYER_JUMP    -5
+#define PLAYER_GRAVITY 0.5
+#define FRAME_INTERVAL 16 //16.666ms for 60FPS 33.333 for 30FPS
 
 class Game
 {
@@ -46,19 +37,14 @@ private:
 	uint8_t m_height = 64;
 	uint8_t m_width = 96;
 
-	const uint8_t m_GAME_PERIOD = 16;
 	unsigned long m_frameStartTime;
 	unsigned long m_frameCurrentTime;
 	unsigned long m_fpsLastCheckTime;
 	unsigned long m_fpsCurrentTime;
 	unsigned long m_frameCount;
-	unsigned int m_fps;
+	unsigned int m_fps = 0;
 
-	unsigned long m_animLastCheckTime;
-	unsigned long m_animCurrentTime;
-	unsigned long m_animframeCount;
-	unsigned int m_ANIM_RATE = 120;
-	unsigned int m_spriteIndex;
+	bool m_playerAnimUpdated = false;
 	Vec2 m_spriteSize = {16, 16};
 
 	void fps(unsigned int seconds);
@@ -69,6 +55,7 @@ private:
 	void sMovement();
 	void sUserInput();
 	void sCollision();
+	void sAnimation();
 	void sRender();
 
 	void spawnPlayer();

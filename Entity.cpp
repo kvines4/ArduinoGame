@@ -32,4 +32,6 @@ void Entity::destroy()
 	delete cBoundingBox;
 	delete cInput;
 	delete cGravity;
+	delete cState;
+	delete cAnimation;
 }

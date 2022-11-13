@@ -52,8 +52,11 @@ void Game::spawnPlayer()
 	m_player = m_entityManager.addEntity("player");
 	m_player->cTransform = new CTransform({48, 32}, {0 , 0});
 	m_player->cBoundingBox = new CBoundingBox({1, 1});
-	m_player->cGravity = new CGravity(1);
+	m_player->cGravity = new CGravity(PLAYER_GRAVITY);
 	m_player->cInput = new CInput();
+	m_player->cState = new CState();
+	m_player->cAnimation = new CAnimation();
+	m_player->cAnimation->animation = Animation("Run", Graphics::playerRunLeft, 4, 2);
 }
 
 void Game::run()
@@ -77,11 +80,12 @@ void Game::update()
 
 	m_entityManager.update();
 
-	if (m_frameCurrentTime - m_frameStartTime >= m_GAME_PERIOD)
+	if (m_frameCurrentTime - m_frameStartTime >= FRAME_INTERVAL)
 	{
 		sUserInput();
 		sMovement();
 		sCollision();
+		sAnimation();
 		sRender();
 
 		fps(1);
@@ -138,6 +142,11 @@ void Game::sMovement()
 	pTransform->prevPos = pTransform->pos;
 	pTransform->pos += pTransform->velocity;
 
+	if(pTransform->velocity.x > 0) 
+		pTransform->facingRight = true;
+	else if(pTransform->velocity.x < 0) 
+		pTransform->facingRight = false;
+
 	// TODO: MOVE OTHER ENTITIES
 
 	// move entities
@@ -159,6 +168,9 @@ void Game::sCollision()
 {
 	auto &pTransform = m_player->cTransform;
 	auto &pGravity	 = m_player->cGravity;
+	auto &pState	 = m_player->cState;
+
+	pState->state = "air";
 	pGravity->grounded = false;
 	// Check if we hit the left wall
 	if (pTransform->pos.x < 0)
@@ -167,49 +179,137 @@ void Game::sCollision()
 		pTransform->velocity.x = 0;
 	}
 	// Check if we hit the right wall
-	if (pTransform->pos.x > m_width - 16)
+	if (pTransform->pos.x > m_width - m_spriteSize.x)
 	{
-		pTransform->pos.x = m_width - 16;
+		pTransform->pos.x = m_width -  m_spriteSize.x;
 		pTransform->velocity.x = 0;
 	}
 	// Check if we hit the floor
-	if (pTransform->pos.y > m_height - 16)
+	if (pTransform->pos.y > m_height - m_spriteSize.y)
 	{
-		pTransform->pos.y = m_height - 16;
+		pState->state = "ground";
+		pTransform->pos.y = m_height -  m_spriteSize.y;
 		pTransform->velocity.y = 0;
 		pGravity->grounded = true;
 	}
+
+#if DEBUGMODE_PRINT_STATE
+	Serial.print("Game:     Player State: ");
+	Serial.println(pState->state);
+#endif
+}
+
+void Game::sAnimation()
+{
+	m_playerAnimUpdated = false;
+
+	auto &pState	 = m_player->cState;
+	auto &pAnimation = m_player->cAnimation;
+	auto &pTransform = m_player->cTransform;
+
+	// set player animation based on state and input
+	if (pState->state == "air")
+	{
+		if(pTransform->facingRight == true)
+		{
+			if (pAnimation->animation.getName() != "JumpRight")
+			{
+#if DEBUGMODE_PRINT_ANIM
+				Serial.println("Game:     Changed Animation: JumpRight");
+#endif
+				m_player->cAnimation->animation = Animation("JumpRight", Graphics::playerJumpRight);
+				m_playerAnimUpdated = true;
+			}
+		}
+		else
+		{
+			if(pAnimation->animation.getName() != "JumpLeft")
+			{
+#if DEBUGMODE_PRINT_ANIM
+				Serial.println("Game:     Changed Animation: JumpLeft");
+#endif
+				m_player->cAnimation->animation = Animation("JumpLeft", Graphics::playerJumpLeft);
+				m_playerAnimUpdated = true;
+			}
+		}
+
+	}
+	else if (pState->state == "ground")
+	{
+		auto& pInput = m_player->cInput;
+		if ((pInput->left || pInput->right) && !(pInput->left && pInput->right))
+		{
+			if(pTransform->facingRight == true)
+			{
+				if (pAnimation->animation.getName() != "RunRight")
+				{
+#if DEBUGMODE_PRINT_ANIM
+					Serial.println("Game:     Changed Animation: RunRight");
+#endif
+					m_player->cAnimation->animation = Animation("RunRight", Graphics::playerRunRight, 4, 2);
+					m_playerAnimUpdated = true;
+				}
+			}
+			else
+			{
+				if (pAnimation->animation.getName() != "RunLeft")
+				{
+#if DEBUGMODE_PRINT_ANIM
+					Serial.println("Game:     Changed Animation: RunLeft");
+#endif
+					m_player->cAnimation->animation = Animation("RunLeft", Graphics::playerRunLeft, 4, 2);
+					m_playerAnimUpdated = true;
+				}
+			}
+		}
+		else
+		{
+			if(pTransform->facingRight == true)
+			{
+				if (pAnimation->animation.getName() != "StandRight")
+				{
+#if DEBUGMODE_PRINT_ANIM
+					Serial.println("Game:     Changed Animation: StandRight");
+#endif
+					m_player->cAnimation->animation = Animation("StandRight", Graphics::playerStandRight);
+					m_playerAnimUpdated = true;
+				}
+			}
+			else
+			{
+				if (pAnimation->animation.getName() != "StandLeft")
+				{
+#if DEBUGMODE_PRINT_ANIM
+					Serial.println("Game:     Changed Animation: StandLeft");
+#endif
+					m_player->cAnimation->animation = Animation("StandLeft", Graphics::playerStandLeft);
+					m_playerAnimUpdated = true;
+				}
+			}
+		}
+	}
+
+	if(m_player->cAnimation->animation.update()) m_playerAnimUpdated = true;
 }
 
 void Game::sRender()
 {
-	bool animationUpdate = false;
-	m_animframeCount++;
-	m_animCurrentTime = millis();
-	if ((m_animCurrentTime - m_animLastCheckTime) >= m_ANIM_RATE)
-	{
-		m_spriteIndex++;
-		if (m_spriteIndex >= 4) m_spriteIndex = 0;
-		animationUpdate = true;
-
-		m_animframeCount = 0;
-		m_animLastCheckTime = m_animCurrentTime;
-	}
 
 	auto &pTransform = m_player->cTransform;
-	//auto &pAnimation = m_player->cAnimation;
+	auto &pAnimation = m_player->cAnimation;
 
-	// only redraw the player when they have moved
+	// only redraw the player when they have moved or animated
 	if (pTransform->pos.x != pTransform->prevPos.x ||
-		pTransform->pos.y != pTransform->prevPos.y)// || animationUpdate)
+		pTransform->pos.y != pTransform->prevPos.y || m_playerAnimUpdated)
 	{
 		Vec2 diff = pTransform->prevPos - pTransform->pos;
 		// black out old pixels based on the position difference between frames
+		// TODO: Have a 'background layer' to redraw from instead of black
 		if (diff.x < 0)
 		{
 			m_display.fillRect(pTransform->prevPos.x,
 							   pTransform->prevPos.y,
-							   abs(diff.x),
+							   abs(diff.x-1.5),
 							   m_spriteSize.y,
 							   BLACK);
 		}
@@ -217,7 +317,7 @@ void Game::sRender()
 		{
 			m_display.fillRect(pTransform->prevPos.x + m_spriteSize.x - diff.x,
 							   pTransform->prevPos.y,
-							   abs(diff.x),
+							   abs(diff.x+1.5),
 							   m_spriteSize.y,
 							   BLACK);
 		}
@@ -226,7 +326,7 @@ void Game::sRender()
 			m_display.fillRect(pTransform->prevPos.x,
 							   pTransform->prevPos.y,
 							   m_spriteSize.x,
-							   abs(diff.y),
+							   abs(diff.y-1.5),
 							   BLACK);
 		}
 		else if (diff.y > 0)
@@ -234,13 +334,13 @@ void Game::sRender()
 			m_display.fillRect(pTransform->prevPos.x,
 							   pTransform->prevPos.y + m_spriteSize.y - diff.y,
 							   m_spriteSize.x,
-							   abs(diff.y),
+							   abs(diff.y+1.5),
 							   BLACK);
 		}
 
 		m_display.drawRGBBitmap(pTransform->pos.x,
 								pTransform->pos.y,
-								Graphics::playerWalkRight[m_spriteIndex],
+								pAnimation->animation.getSprite(),
 								m_spriteSize.x,
 								m_spriteSize.y);
 	}

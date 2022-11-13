@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Animation.h"
 #include "Vec2.h"
 #include "Common.h"
 
@@ -9,6 +10,7 @@ public:
 	Vec2 pos = {0.0, 0.0};
 	Vec2 prevPos = {0.0, 0.0};
 	Vec2 velocity = {0.0, 0.0};
+	bool facingRight = true;
 
 	CTransform(const Vec2 &p, const Vec2 &v)
 		: pos(p), velocity(v) {}
@@ -41,4 +43,21 @@ public:
 	bool grounded = false;
 	CGravity() {}
 	CGravity(float g) : gravity(g) {}
+};
+
+class CState
+{
+public:
+	String state = "air";
+	CState() {}
+	CState(const String& s) : state(s) {}
+};
+
+class CAnimation
+{
+public:
+	Animation animation;
+	CAnimation() {}
+	CAnimation(const Animation& animation)
+		: animation(animation) {}
 };

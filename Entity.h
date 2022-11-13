@@ -21,6 +21,8 @@ public:
 	CBoundingBox *cBoundingBox = nullptr;
 	CInput		 *cInput	   = nullptr;
 	CGravity	 *cGravity	   = nullptr;
+	CState		 *cState	   = nullptr;
+	CAnimation	 *cAnimation   = nullptr;
 
 	// private member access functions
 	bool isActive();
