@@ -8,18 +8,20 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1331.h>
 
-// Button Pins
-#define LEFT_BUTTON  4
-#define RIGHT_BUTTON 3
-#define JUMP_BUTTON  2
+// 74HC165 Shift Register pins
+#define SR_74HC165_LOAD 		 2	// PL pin 1
+#define SR_74HC165_CLOCK_ENABLE	 5	//CE pin 15
+#define SR_74HC165_DATA_IN		 4	// Q7 pin 7
+#define SR_74HC165_CLOCK_IN		 3	// CP pin 2
 
 // SSD1331 Pins
-#define SCLK 13 // SCL // 13 is serial clock on pro mini
-#define MOSI 11 // SDA // 11 is mosi on pro mini
-#define RST  8  // RES
-#define DC   9  // DC
-#define CS   10 // CS // 10 is slave select on pro mini
+#define SSD1331_SCLK 13 // SCL // 13 is serial clock on pro mini
+#define SSD1331_MOSI 11 // SDA // 11 is SSD1331_MOSI on pro mini
+#define SSD1331_CS   10 // SSD1331_CS  // 10 is slave select on pro mini
+#define SSD1331_DC   9  // DC
+#define SSD1331_RST  8  // RES
 
+// Game Values
 #define PLAYER_SPEED   3
 #define PLAYER_JUMP    -5
 #define PLAYER_GRAVITY 0.5
@@ -33,7 +35,7 @@ private:
 	EntityManager m_entityManager;
 	Entity *m_player = nullptr;
 
-	Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, CS, DC, RST);
+	Adafruit_SSD1331 m_display = Adafruit_SSD1331(&SPI, SSD1331_CS, SSD1331_DC, SSD1331_RST);
 	uint8_t m_height = 64;
 	uint8_t m_width = 96;
 

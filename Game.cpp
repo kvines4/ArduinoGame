@@ -18,9 +18,11 @@ void Game::init()
 
 	SPI.begin();
 
-	pinMode(LEFT_BUTTON,  INPUT_PULLUP);
-	pinMode(RIGHT_BUTTON, INPUT_PULLUP);
-	pinMode(JUMP_BUTTON,  INPUT_PULLUP);
+	// Setup 74HC165 connections
+	pinMode(SR_74HC165_LOAD, OUTPUT);
+	pinMode(SR_74HC165_CLOCK_ENABLE, OUTPUT);
+	pinMode(SR_74HC165_CLOCK_IN, OUTPUT);
+	pinMode(SR_74HC165_DATA_IN, INPUT);
 
 	// show splash screen
 	m_display.begin();
@@ -98,10 +100,43 @@ void Game::sUserInput()
 {
 	auto &pInput = m_player->cInput;
 
-	pInput->left  = (digitalRead(LEFT_BUTTON)  == HIGH);
-	pInput->right = (digitalRead(RIGHT_BUTTON) == HIGH);
-	pInput->jump  = (digitalRead(JUMP_BUTTON)  == HIGH);
+	// Write pulse to SR74HC165_LOAD pin
+	digitalWrite(SR_74HC165_LOAD, LOW);
+	delayMicroseconds(5);
+	digitalWrite(SR_74HC165_LOAD, HIGH);
+	delayMicroseconds(5);
 
+	// Get data from 74HC165
+	digitalWrite(SR_74HC165_CLOCK_IN, HIGH);
+	digitalWrite(SR_74HC165_CLOCK_ENABLE, LOW);
+	byte incoming = shiftIn(SR_74HC165_DATA_IN, SR_74HC165_CLOCK_IN, LSBFIRST);
+	digitalWrite(SR_74HC165_CLOCK_ENABLE, HIGH);
+
+	// Only using 3 inputs, the rest are tied to ground for now
+	// TODO: This should eventually move out of the game code and into "Engine" code
+	// SR Inputs are active low. Invertion required.
+	pInput->left  = !bitRead(incoming, 0);	// Left
+	bool input1   = !bitRead(incoming, 1);	// Up
+	bool input2   = !bitRead(incoming, 2);	// Down
+	pInput->right = !bitRead(incoming, 3);	// Right
+	pInput->jump  = !bitRead(incoming, 4);	// A
+	bool input5   = !bitRead(incoming, 5);	// B
+	bool input6   = !bitRead(incoming, 6);	// Start
+	bool input7   = !bitRead(incoming, 7);	// Select
+
+#if DEBUGMODE_PRINT_SR_INPUTS
+	Serial.print(input7);
+	Serial.print(input6);
+	Serial.print(input5);
+	Serial.print(input4);
+	Serial.print(input3);
+	Serial.print(input2);
+	Serial.print(input1);
+	Serial.println(input0);
+
+	Serial.println(incoming, BIN);
+	Serial.println("___________");
+#endif
 #if DEBUGMODE_PRINT_INPUTS
 	Serial.print("Left: ");
 	Serial.print(pInput->left);

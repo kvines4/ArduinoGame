@@ -20,6 +20,8 @@
 // unsigned char is for drawBitmap (one color)
 // uint16_t is for drawRGBBitmap (RGB)
 
+// TODO: these sprites take up too much memory.
+
 namespace Graphics
 {
 	namespace {
