@@ -48,7 +48,7 @@ public:
 class CState
 {
 public:
-	String state = "air";
+	String state;
 	CState() {}
 	CState(const String& s) : state(s) {}
 };

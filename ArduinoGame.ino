@@ -1,8 +1,8 @@
 #include <Arduino.h>
-#include "Game.h"
+#include "GameEngine.h"
 #include "Common.h"
 
-Game *game;
+GameEngine* g;
 
 int main(void)
 {
@@ -15,8 +15,8 @@ int main(void)
 	// to restart the game we can just exit the game loop
 	for (;;)
 	{
-		game = new Game();
-		game->run();
+		g = new GameEngine();
+		g->run();
 	}
 
 	return 0;

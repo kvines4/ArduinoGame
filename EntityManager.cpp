@@ -34,7 +34,7 @@ void EntityManager::removeDeadEntities()
 
 Entity *EntityManager::addEntity(const String &tag)
 {
-#if DEBUGMODE
+#if DEBUGMODE_PRINT_EMANAGER
 	Serial.print("EManager: Spawned ");
 	Serial.print(tag);
 	Serial.print("Player with ID: ");
@@ -45,7 +45,7 @@ Entity *EntityManager::addEntity(const String &tag)
 	m_totalEntities++;
 	m_entitiesToAdd.push_back(entity);
 
-#if DEBUGMODE
+#if DEBUGMODE_PRINT_EMANAGER
 	Serial.print("EManager: totalEntities: ");
 	Serial.println(m_totalEntities);
 #endif

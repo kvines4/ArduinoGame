@@ -9,7 +9,7 @@ class Animation
 	size_t	m_currentFrame = 0;		   // the current frame of animation being played
 	size_t	m_speed		   = 0;		   // the speed to play this animation
 	Vec2	m_size		   = { 1, 1 }; // size of the animation frame
-	String	m_name		   = "none";
+	String	m_name;
 	
 	const uint16_t** m_spriteArray = nullptr;
 

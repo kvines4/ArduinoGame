@@ -13,7 +13,7 @@ private:
 
 	bool m_active = true;
 	size_t m_id = 0;
-	String m_tag = "Default";
+	String m_tag;
 
 public:
 	// component pointers

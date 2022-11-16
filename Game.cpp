@@ -1,49 +1,38 @@
 #include "Game.h"
 
+#include "GameEngine.h"
 #include "Graphics.h"
 
-#include <SPI.h>
-#include <Wire.h>
-
-Game::Game()
+Game::Game(GameEngine* gameEngine)
+	: m_gameEngine(gameEngine)
 {
 	init();
 }
 
 void Game::init()
 {
-#if DEBUGMODE
+#if DEBUGMODE_PRINT_FUNCS
 	Serial.println("Game:     Init");
 #endif
-
-	SPI.begin();
-
-	// Setup 74HC165 connections
-	pinMode(SR_74HC165_LOAD, OUTPUT);
-	pinMode(SR_74HC165_CLOCK_ENABLE, OUTPUT);
-	pinMode(SR_74HC165_CLOCK_IN, OUTPUT);
-	pinMode(SR_74HC165_DATA_IN, INPUT);
-
 	// show splash screen
-	m_display.begin();
-	m_display.fillScreen(BLACK);
-	m_display.setCursor(6, 13);
-	m_display.setTextColor(RED);
-	m_display.setTextSize(2);
-	m_display.print("Arduino");
-	m_display.drawBitmap(10, 25, Graphics::gameLogo, 75, 26, RED);
+	m_gameEngine->display().begin();
+	m_gameEngine->display().fillScreen(BLACK);
+	m_gameEngine->display().setCursor(6, 13);
+	m_gameEngine->display().setTextColor(RED);
+	m_gameEngine->display().setTextSize(2);
+	m_gameEngine->display().print(F("Arduino"));
+	m_gameEngine->display().drawBitmap(10, 25, Graphics::gameLogo, 75, 26, RED);
 	delay(2000);
-	m_display.fillScreen(BLACK);
+	m_gameEngine->display().fillScreen(BLACK);
 
 	// init game
 	m_entityManager = EntityManager();
 	spawnPlayer();
-	m_frameStartTime = millis();
 }
 
 void Game::spawnPlayer()
 {
-#if DEBUGMODE
+#if DEBUGMODE_PRINT_FUNCS
 	Serial.println("Game:     Spawn Player");
 #endif
 
@@ -51,26 +40,14 @@ void Game::spawnPlayer()
 	{
 		m_player->destroy();
 	}
-	m_player = m_entityManager.addEntity("player");
+	m_player = m_entityManager.addEntity(F("player"));
 	m_player->cTransform = new CTransform({48, 32}, {0 , 0});
 	m_player->cBoundingBox = new CBoundingBox({1, 1});
 	m_player->cGravity = new CGravity(PLAYER_GRAVITY);
 	m_player->cInput = new CInput();
 	m_player->cState = new CState();
 	m_player->cAnimation = new CAnimation();
-	m_player->cAnimation->animation = Animation("Run", Graphics::playerRunLeft, 4, 2);
-}
-
-void Game::run()
-{
-#if DEBUGMODE
-	Serial.println("Game:     Run");
-#endif
-
-	while (m_running)
-	{
-		update();
-	}
+	m_player->cAnimation->animation = Animation(F("Run"), Graphics::playerRunLeft, 4, 2);
 }
 
 /// millis() returns the number of milliseconds passed since the Arduino board began.
@@ -78,65 +55,22 @@ void Game::run()
 /// This should keep the frame rate consistent.
 void Game::update()
 {
-	m_frameCurrentTime = millis();
-
 	m_entityManager.update();
-
-	if (m_frameCurrentTime - m_frameStartTime >= FRAME_INTERVAL)
-	{
-		sUserInput();
-		sMovement();
-		sCollision();
-		sAnimation();
-		sRender();
-
-		fps(1);
-
-		m_frameStartTime = m_frameCurrentTime;
-	}
+	sUserInput();
+	sMovement();
+	sCollision();
+	sAnimation();
 }
 
 void Game::sUserInput()
 {
+	//TODO: replace this with an input action system
 	auto &pInput = m_player->cInput;
 
-	// Write pulse to SR74HC165_LOAD pin
-	digitalWrite(SR_74HC165_LOAD, LOW);
-	delayMicroseconds(5);
-	digitalWrite(SR_74HC165_LOAD, HIGH);
-	delayMicroseconds(5);
+	pInput->left  = m_gameEngine->m_input.buttons[BUTTON_LEFT].is_down;
+	pInput->right = m_gameEngine->m_input.buttons[BUTTON_RIGHT].is_down;
+	pInput->jump  = m_gameEngine->m_input.buttons[BUTTON_A].is_down;
 
-	// Get data from 74HC165
-	digitalWrite(SR_74HC165_CLOCK_IN, HIGH);
-	digitalWrite(SR_74HC165_CLOCK_ENABLE, LOW);
-	byte incoming = shiftIn(SR_74HC165_DATA_IN, SR_74HC165_CLOCK_IN, LSBFIRST);
-	digitalWrite(SR_74HC165_CLOCK_ENABLE, HIGH);
-
-	// Only using 3 inputs, the rest are tied to ground for now
-	// TODO: This should eventually move out of the game code and into "Engine" code
-	// SR Inputs are active low. Invertion required.
-	pInput->left  = !bitRead(incoming, 0);	// Left
-	bool input1   = !bitRead(incoming, 1);	// Up
-	bool input2   = !bitRead(incoming, 2);	// Down
-	pInput->right = !bitRead(incoming, 3);	// Right
-	pInput->jump  = !bitRead(incoming, 4);	// A
-	bool input5   = !bitRead(incoming, 5);	// B
-	bool input6   = !bitRead(incoming, 6);	// Start
-	bool input7   = !bitRead(incoming, 7);	// Select
-
-#if DEBUGMODE_PRINT_SR_INPUTS
-	Serial.print(input7);
-	Serial.print(input6);
-	Serial.print(input5);
-	Serial.print(input4);
-	Serial.print(input3);
-	Serial.print(input2);
-	Serial.print(input1);
-	Serial.println(input0);
-
-	Serial.println(incoming, BIN);
-	Serial.println("___________");
-#endif
 #if DEBUGMODE_PRINT_INPUTS
 	Serial.print("Left: ");
 	Serial.print(pInput->left);
@@ -205,7 +139,7 @@ void Game::sCollision()
 	auto &pGravity	 = m_player->cGravity;
 	auto &pState	 = m_player->cState;
 
-	pState->state = "air";
+	pState->state = F("air");
 	pGravity->grounded = false;
 	// Check if we hit the left wall
 	if (pTransform->pos.x < 0)
@@ -214,16 +148,16 @@ void Game::sCollision()
 		pTransform->velocity.x = 0;
 	}
 	// Check if we hit the right wall
-	if (pTransform->pos.x > m_width - m_spriteSize.x)
+	if (pTransform->pos.x > m_gameEngine->displayWidth() - SPRITE_SIZE.x)
 	{
-		pTransform->pos.x = m_width -  m_spriteSize.x;
+		pTransform->pos.x = m_gameEngine->displayWidth() -  SPRITE_SIZE.x;
 		pTransform->velocity.x = 0;
 	}
 	// Check if we hit the floor
-	if (pTransform->pos.y > m_height - m_spriteSize.y)
+	if (pTransform->pos.y > m_gameEngine->displayHeight() - SPRITE_SIZE.y)
 	{
-		pState->state = "ground";
-		pTransform->pos.y = m_height -  m_spriteSize.y;
+		pState->state = F("ground");
+		pTransform->pos.y = m_gameEngine->displayHeight() -  SPRITE_SIZE.y;
 		pTransform->velocity.y = 0;
 		pGravity->grounded = true;
 	}
@@ -243,56 +177,56 @@ void Game::sAnimation()
 	auto &pTransform = m_player->cTransform;
 
 	// set player animation based on state and input
-	if (pState->state == "air")
+	if (pState->state == F("air"))
 	{
 		if(pTransform->facingRight == true)
 		{
-			if (pAnimation->animation.getName() != "JumpRight")
+			if (pAnimation->animation.getName() != F("JumpRight"))
 			{
 #if DEBUGMODE_PRINT_ANIM
 				Serial.println("Game:     Changed Animation: JumpRight");
 #endif
-				m_player->cAnimation->animation = Animation("JumpRight", Graphics::playerJumpRight);
+				m_player->cAnimation->animation = Animation(F("JumpRight"), Graphics::playerJumpRight);
 				m_playerAnimUpdated = true;
 			}
 		}
 		else
 		{
-			if(pAnimation->animation.getName() != "JumpLeft")
+			if(pAnimation->animation.getName() != F("JumpLeft"))
 			{
 #if DEBUGMODE_PRINT_ANIM
 				Serial.println("Game:     Changed Animation: JumpLeft");
 #endif
-				m_player->cAnimation->animation = Animation("JumpLeft", Graphics::playerJumpLeft);
+				m_player->cAnimation->animation = Animation(F("JumpLeft"), Graphics::playerJumpLeft);
 				m_playerAnimUpdated = true;
 			}
 		}
 
 	}
-	else if (pState->state == "ground")
+	else if (pState->state == F("ground"))
 	{
 		auto& pInput = m_player->cInput;
 		if ((pInput->left || pInput->right) && !(pInput->left && pInput->right))
 		{
 			if(pTransform->facingRight == true)
 			{
-				if (pAnimation->animation.getName() != "RunRight")
+				if (pAnimation->animation.getName() != F("RunRight"))
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: RunRight");
 #endif
-					m_player->cAnimation->animation = Animation("RunRight", Graphics::playerRunRight, 4, 2);
+					m_player->cAnimation->animation = Animation(F("RunRight"), Graphics::playerRunRight, 4, 2);
 					m_playerAnimUpdated = true;
 				}
 			}
 			else
 			{
-				if (pAnimation->animation.getName() != "RunLeft")
+				if (pAnimation->animation.getName() != F("RunLeft"))
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: RunLeft");
 #endif
-					m_player->cAnimation->animation = Animation("RunLeft", Graphics::playerRunLeft, 4, 2);
+					m_player->cAnimation->animation = Animation(F("RunLeft"), Graphics::playerRunLeft, 4, 2);
 					m_playerAnimUpdated = true;
 				}
 			}
@@ -301,23 +235,23 @@ void Game::sAnimation()
 		{
 			if(pTransform->facingRight == true)
 			{
-				if (pAnimation->animation.getName() != "StandRight")
+				if (pAnimation->animation.getName() != F("StandRight"))
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: StandRight");
 #endif
-					m_player->cAnimation->animation = Animation("StandRight", Graphics::playerStandRight);
+					m_player->cAnimation->animation = Animation(F("StandRight"), Graphics::playerStandRight);
 					m_playerAnimUpdated = true;
 				}
 			}
 			else
 			{
-				if (pAnimation->animation.getName() != "StandLeft")
+				if (pAnimation->animation.getName() != F("StandLeft"))
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: StandLeft");
 #endif
-					m_player->cAnimation->animation = Animation("StandLeft", Graphics::playerStandLeft);
+					m_player->cAnimation->animation = Animation(F("StandLeft"), Graphics::playerStandLeft);
 					m_playerAnimUpdated = true;
 				}
 			}
@@ -329,7 +263,6 @@ void Game::sAnimation()
 
 void Game::sRender()
 {
-
 	auto &pTransform = m_player->cTransform;
 	auto &pAnimation = m_player->cAnimation;
 
@@ -342,67 +275,41 @@ void Game::sRender()
 		// TODO: Have a 'background layer' to redraw from instead of black
 		if (diff.x < 0)
 		{
-			m_display.fillRect(pTransform->prevPos.x,
+			m_gameEngine->display().fillRect(pTransform->prevPos.x,
 							   pTransform->prevPos.y,
 							   abs(diff.x-1.5),
-							   m_spriteSize.y,
+							   SPRITE_SIZE.y,
 							   BLACK);
 		}
 		else if (diff.x > 0)
 		{
-			m_display.fillRect(pTransform->prevPos.x + m_spriteSize.x - diff.x,
+			m_gameEngine->display().fillRect(pTransform->prevPos.x + SPRITE_SIZE.x - diff.x,
 							   pTransform->prevPos.y,
 							   abs(diff.x+1.5),
-							   m_spriteSize.y,
+							   SPRITE_SIZE.y,
 							   BLACK);
 		}
 		if (diff.y < 0)
 		{
-			m_display.fillRect(pTransform->prevPos.x,
+			m_gameEngine->display().fillRect(pTransform->prevPos.x,
 							   pTransform->prevPos.y,
-							   m_spriteSize.x,
+							   SPRITE_SIZE.x,
 							   abs(diff.y-1.5),
 							   BLACK);
 		}
 		else if (diff.y > 0)
 		{
-			m_display.fillRect(pTransform->prevPos.x,
-							   pTransform->prevPos.y + m_spriteSize.y - diff.y,
-							   m_spriteSize.x,
+			m_gameEngine->display().fillRect(pTransform->prevPos.x,
+							   pTransform->prevPos.y + SPRITE_SIZE.y - diff.y,
+							   SPRITE_SIZE.x,
 							   abs(diff.y+1.5),
 							   BLACK);
 		}
 
-		m_display.drawRGBBitmap(pTransform->pos.x,
+		m_gameEngine->display().drawRGBBitmap(pTransform->pos.x,
 								pTransform->pos.y,
 								pAnimation->animation.getSprite(),
-								m_spriteSize.x,
-								m_spriteSize.y);
-	}
-}
-
-/// @brief Increment frame count each call. Display's current FPS after small delay.
-/// @param seconds How many seconds between FPS checks.
-void Game::fps(unsigned int seconds)
-{
-	if(seconds < 1) seconds = 1;
-	m_frameCount++;
-	m_fpsCurrentTime = millis();
-	if ((m_fpsCurrentTime - m_fpsLastCheckTime) >= (seconds * 1000))
-	{
-		m_fps = (m_frameCount / seconds);
-		m_frameCount = 0;
-		m_fpsLastCheckTime = m_fpsCurrentTime;
-
-		m_display.fillRect(0, 0, 42, 8, BLACK);
-		m_display.setCursor(0, 0);
-		m_display.setTextColor(WHITE);
-		m_display.setTextSize(1);
-		m_display.print(m_fps);
-
-#if DEBUGMODE_PRINT_FPS
-		Serial.print("FPS: ");
-		Serial.println(m_fps);
-#endif
+								SPRITE_SIZE.x,
+								SPRITE_SIZE.y);
 	}
 }
