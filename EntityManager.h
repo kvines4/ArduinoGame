@@ -21,7 +21,7 @@ public:
 
 	void update();
 
-	Entity *addEntity(const String &tag);
+	Entity *addEntity(EntityType type);
 
 	const EntityVec &getEntities();
 	size_t getTotal() const;

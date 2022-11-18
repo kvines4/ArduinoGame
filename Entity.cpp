@@ -1,8 +1,8 @@
 #include "Entity.h"
 #include "arduino.h"
 
-Entity::Entity(const size_t i, const String &t)
-	: m_id(i), m_tag(t) {}
+Entity::Entity(const size_t i, EntityType t)
+	: m_id(i), m_type(t) {}
 
 Entity::~Entity()
 {
@@ -14,9 +14,9 @@ bool Entity::isActive()
 	return m_active;
 }
 
-const String &Entity::tag() const
+EntityType Entity::type() const
 {
-	return m_tag;
+	return m_type;
 }
 
 size_t Entity::id() const

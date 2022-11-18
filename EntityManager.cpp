@@ -32,7 +32,7 @@ void EntityManager::removeDeadEntities()
 	}
 }
 
-Entity *EntityManager::addEntity(const String &tag)
+Entity *EntityManager::addEntity(EntityType type)
 {
 #if DEBUGMODE_PRINT_EMANAGER
 	Serial.print("EManager: Spawned ");
@@ -41,7 +41,7 @@ Entity *EntityManager::addEntity(const String &tag)
 	Serial.println(m_totalEntities);
 #endif
 
-	Entity *entity = new Entity(m_totalEntities, tag);
+	Entity *entity = new Entity(m_totalEntities, type);
 	m_totalEntities++;
 	m_entitiesToAdd.push_back(entity);
 

@@ -134,10 +134,18 @@ void GameEngine::sUserInput()
 	Serial.println("___________");
 #endif
 
-// for each input
-// check if state is either just pressed or just released
-// call doaction in game
-
+	for (uint8_t i = 0; i < BUTTON_COUNT; i++)
+	{
+		if(m_input.buttons[i].changed)
+		{
+			// if the current scene does not have an action associated with this key, skip the event
+			if (m_game->getActionMap().find(i) == m_game->getActionMap().end()) { continue; }
+			// determine start or end action by whether it was key press or release
+			const String actionType = (m_input.buttons[i].is_down) ? "START" : "END";
+			// look up the action and send the action to the scene
+			m_game->doAction(Action(m_game->getActionMap().at(i), actionType));
+		}
+	}
 }
 
 /// @brief Increment frame count each call. Display's current FPS after small delay.

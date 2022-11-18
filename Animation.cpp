@@ -7,14 +7,14 @@ Animation::Animation()
 
 }
 
-Animation::Animation(const String& name, const uint16_t** spriteArray)
-	: Animation(name, spriteArray, 1, 0)
+Animation::Animation(animationType type, const uint16_t** spriteArray)
+	: Animation(type, spriteArray, 1, 0)
 {
 
 }
 
-Animation::Animation(const String &name, const uint16_t **spriteArray, size_t frameCount, size_t speed)
-	: m_name(name)
+Animation::Animation(animationType type, const uint16_t **spriteArray, size_t frameCount, size_t speed)
+	: m_type(type)
 	, m_spriteArray(spriteArray)
 	, m_frameCount(frameCount)
 	, m_speed(speed)
@@ -48,7 +48,7 @@ bool Animation::hasEnded() const
 	return m_currentFrame == (m_frameCount-1) * m_speed;
 }
 
-const String& Animation::getName()
+animationType Animation::getType()
 {
-	return m_name;
+	return m_type;
 }

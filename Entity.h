@@ -3,17 +3,23 @@
 #include "arduino.h"
 #include "Components.h"
 
+enum EntityType {
+	Player,
+	Tile,
+	Enemy
+};
+
 class Entity
 {
 private:
 	friend class EntityManager;
 
-	Entity(const size_t id, const String &tag);
+	Entity(const size_t id, EntityType type);
 	~Entity();
 
-	bool m_active = true;
-	size_t m_id = 0;
-	String m_tag;
+	bool		m_active = true;
+	size_t		m_id	 = 0;
+	EntityType	m_type;
 
 public:
 	// component pointers
@@ -26,7 +32,7 @@ public:
 
 	// private member access functions
 	bool isActive();
-	const String &tag() const;
+	EntityType type() const;
 	size_t id() const;
 	void destroy();
 };

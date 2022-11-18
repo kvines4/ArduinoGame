@@ -1,6 +1,7 @@
-#include <Arduino.h>
 #include "GameEngine.h"
 #include "Common.h"
+
+#include <Arduino.h>
 
 GameEngine* g;
 

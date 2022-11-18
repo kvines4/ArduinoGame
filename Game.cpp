@@ -27,6 +27,9 @@ void Game::init()
 
 	// init game
 	m_entityManager = EntityManager();
+	registerAction(BUTTON_A,	 "JUMP");
+	registerAction(BUTTON_LEFT,	 "LEFT");
+	registerAction(BUTTON_RIGHT, "RIGHT");
 	spawnPlayer();
 }
 
@@ -40,14 +43,51 @@ void Game::spawnPlayer()
 	{
 		m_player->destroy();
 	}
-	m_player = m_entityManager.addEntity(F("player"));
+	m_player = m_entityManager.addEntity(Player);
 	m_player->cTransform = new CTransform({48, 32}, {0 , 0});
 	m_player->cBoundingBox = new CBoundingBox({1, 1});
 	m_player->cGravity = new CGravity(PLAYER_GRAVITY);
 	m_player->cInput = new CInput();
 	m_player->cState = new CState();
 	m_player->cAnimation = new CAnimation();
-	m_player->cAnimation->animation = Animation(F("Run"), Graphics::playerRunLeft, 4, 2);
+	m_player->cAnimation->animation = Animation(RunLeft, Graphics::playerRunLeft, 4, 2);
+}
+
+/// @brief Probably overkill for an arduino, but this decouples the inputs from the actions.
+/// If the input system/hardware is updated or changed it will not affect the game itself.
+void Game::doAction(Action action)
+{
+	auto &pInput	 = m_player->cInput;
+	auto &pState	 = m_player->cState;
+	auto &pTransform = m_player->cTransform;
+
+	if (action.type() == "START")
+	{
+		if (action.name() == "JUMP")	   { pInput->jump  = true; }
+		else if (action.name() == "LEFT")  { pInput->left  = true; }
+		else if (action.name() == "RIGHT") { pInput->right = true; }
+	}
+	else if (action.type() == "END") 
+	{
+		if (action.name() == "JUMP") 
+		{ 
+			if (pTransform->velocity.y < 0) { pTransform->velocity.y = 0; }
+			pInput->canJump	= true;
+			pInput->jump	= false;
+		}
+		else if (action.name() == "LEFT")  { pInput->left  = false; }
+		else if (action.name() == "RIGHT") { pInput->right = false; }
+	}
+}
+
+void Game::registerAction(int button, const String& action)
+{
+	m_actionMap[button] = action;
+}
+
+ActionMap& Game::getActionMap()
+{
+	return m_actionMap;
 }
 
 /// millis() returns the number of milliseconds passed since the Arduino board began.
@@ -139,7 +179,7 @@ void Game::sCollision()
 	auto &pGravity	 = m_player->cGravity;
 	auto &pState	 = m_player->cState;
 
-	pState->state = F("air");
+	pState->state = Air;
 	pGravity->grounded = false;
 	// Check if we hit the left wall
 	if (pTransform->pos.x < 0)
@@ -156,7 +196,7 @@ void Game::sCollision()
 	// Check if we hit the floor
 	if (pTransform->pos.y > m_gameEngine->displayHeight() - SPRITE_SIZE.y)
 	{
-		pState->state = F("ground");
+		pState->state = Ground;
 		pTransform->pos.y = m_gameEngine->displayHeight() -  SPRITE_SIZE.y;
 		pTransform->velocity.y = 0;
 		pGravity->grounded = true;
@@ -177,56 +217,56 @@ void Game::sAnimation()
 	auto &pTransform = m_player->cTransform;
 
 	// set player animation based on state and input
-	if (pState->state == F("air"))
+	if (pState->state == Air)
 	{
 		if(pTransform->facingRight == true)
 		{
-			if (pAnimation->animation.getName() != F("JumpRight"))
+			if (pAnimation->animation.getType() != JumpRight)
 			{
 #if DEBUGMODE_PRINT_ANIM
 				Serial.println("Game:     Changed Animation: JumpRight");
 #endif
-				m_player->cAnimation->animation = Animation(F("JumpRight"), Graphics::playerJumpRight);
+				m_player->cAnimation->animation = Animation(JumpRight, Graphics::playerJumpRight);
 				m_playerAnimUpdated = true;
 			}
 		}
 		else
 		{
-			if(pAnimation->animation.getName() != F("JumpLeft"))
+			if(pAnimation->animation.getType() != JumpLeft)
 			{
 #if DEBUGMODE_PRINT_ANIM
 				Serial.println("Game:     Changed Animation: JumpLeft");
 #endif
-				m_player->cAnimation->animation = Animation(F("JumpLeft"), Graphics::playerJumpLeft);
+				m_player->cAnimation->animation = Animation(JumpLeft, Graphics::playerJumpLeft);
 				m_playerAnimUpdated = true;
 			}
 		}
 
 	}
-	else if (pState->state == F("ground"))
+	else if (pState->state == Ground)
 	{
 		auto& pInput = m_player->cInput;
 		if ((pInput->left || pInput->right) && !(pInput->left && pInput->right))
 		{
 			if(pTransform->facingRight == true)
 			{
-				if (pAnimation->animation.getName() != F("RunRight"))
+				if (pAnimation->animation.getType() != RunRight)
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: RunRight");
 #endif
-					m_player->cAnimation->animation = Animation(F("RunRight"), Graphics::playerRunRight, 4, 2);
+					m_player->cAnimation->animation = Animation(RunRight, Graphics::playerRunRight, 4, 2);
 					m_playerAnimUpdated = true;
 				}
 			}
 			else
 			{
-				if (pAnimation->animation.getName() != F("RunLeft"))
+				if (pAnimation->animation.getType() != RunLeft)
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: RunLeft");
 #endif
-					m_player->cAnimation->animation = Animation(F("RunLeft"), Graphics::playerRunLeft, 4, 2);
+					m_player->cAnimation->animation = Animation(RunLeft, Graphics::playerRunLeft, 4, 2);
 					m_playerAnimUpdated = true;
 				}
 			}
@@ -235,23 +275,23 @@ void Game::sAnimation()
 		{
 			if(pTransform->facingRight == true)
 			{
-				if (pAnimation->animation.getName() != F("StandRight"))
+				if (pAnimation->animation.getType() != StandRight)
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: StandRight");
 #endif
-					m_player->cAnimation->animation = Animation(F("StandRight"), Graphics::playerStandRight);
+					m_player->cAnimation->animation = Animation(StandRight, Graphics::playerStandRight);
 					m_playerAnimUpdated = true;
 				}
 			}
 			else
 			{
-				if (pAnimation->animation.getName() != F("StandLeft"))
+				if (pAnimation->animation.getType() != StandLeft)
 				{
 #if DEBUGMODE_PRINT_ANIM
 					Serial.println("Game:     Changed Animation: StandLeft");
 #endif
-					m_player->cAnimation->animation = Animation(F("StandLeft"), Graphics::playerStandLeft);
+					m_player->cAnimation->animation = Animation(StandLeft, Graphics::playerStandLeft);
 					m_playerAnimUpdated = true;
 				}
 			}

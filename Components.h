@@ -29,9 +29,10 @@ public:
 class CInput
 {
 public:
-	bool jump = false;
-	bool left = false;
-	bool right = false;
+	bool jump	 = false;
+	bool canJump = false;
+	bool left	 = false;
+	bool right	 = false;
 
 	CInput() {}
 };
@@ -45,12 +46,17 @@ public:
 	CGravity(float g) : gravity(g) {}
 };
 
+enum stateType {
+	Air,
+	Ground
+};
+
 class CState
 {
 public:
-	String state;
+	stateType state;
 	CState() {}
-	CState(const String& s) : state(s) {}
+	CState(stateType s) : state(s) {}
 };
 
 class CAnimation
